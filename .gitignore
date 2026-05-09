@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.venv/
+venv/
+env/
+
+# uv
+.uv/
+
+# Node
+node_modules/
+.next/
+out/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Generated docs
+docs/architecture.svg
+docs/eval_scorecard.svg
+
+# Eval reports. keep `latest.json` checked in (eval gate compares against it).
+# Per-run timestamped reports are gitignored to avoid clutter.
+evals/reports/run_*.json
+evals/reports/*.md
+!evals/reports/.gitkeep
+!evals/reports/latest.json
+
+# Local data
+data/uploads/
+data/cache/
+# Sample PDFs are large and licensed binaries; fetch via `make fetch-samples`
+data/samples/*.pdf
+!data/samples/.gitkeep
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Mac
+.DS_Store

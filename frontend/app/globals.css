@@ -1,0 +1,270 @@
+@import "tailwindcss";
+
+@theme {
+  /* ─── Editorial palette ──────────────────────────────────────────── *\
+   * Warm paper background. Deep ink type. One terracotta accent.
+   * Designed against Anthropic / Apple / Brilliant.org aesthetic.
+  \* ────────────────────────────────────────────────────────────────── */
+
+  --color-paper: oklch(96.5% 0.012 80);
+  --color-paper-soft: oklch(98.2% 0.008 80);
+  --color-paper-deep: oklch(93.5% 0.014 80);
+  --color-card: oklch(100% 0 0);
+
+  --color-ink: oklch(20% 0.015 264);
+  --color-ink-soft: oklch(40% 0.012 264);
+  --color-ink-faint: oklch(58% 0.008 264);
+  --color-ink-line: oklch(86% 0.008 80);
+  --color-ink-line-soft: oklch(91% 0.006 80);
+
+  --color-accent: oklch(58% 0.18 30); /* terracotta */
+  --color-accent-soft: oklch(94% 0.05 30);
+  --color-accent-deep: oklch(48% 0.18 30);
+
+  --color-forest: oklch(45% 0.13 150);
+  --color-forest-soft: oklch(94% 0.04 150);
+  --color-violet: oklch(45% 0.16 290);
+  --color-violet-soft: oklch(94% 0.04 290);
+  --color-amber: oklch(70% 0.16 80);
+
+  /* Typography */
+  --font-display: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "SF Mono", ui-monospace, monospace;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Radii, softer, paper-feel */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-pill: 999px;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    color-scheme: light;
+    font-feature-settings: "ss01", "cv11", "calt";
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    overflow-x: hidden;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-paper-soft);
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-ink-line);
+    border-radius: 999px;
+    border: 3px solid var(--color-paper);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ink-faint);
+  }
+}
+
+@layer utilities {
+  /* Display serif, magazine headlines */
+  .font-display {
+    font-family: var(--font-display);
+    font-feature-settings: "ss01", "ss02", "calt", "liga";
+  }
+  .font-display-italic {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-feature-settings: "ss01", "ss02", "calt", "liga", "swsh";
+  }
+
+  /* Paper texture, barely visible warm grain */
+  .paper-grain {
+    position: relative;
+  }
+  .paper-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0.95 0 0 0 0 0.92 0 0 0 0 0.85 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Subtle paper card, soft warm shadow */
+  .paper-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-ink-line);
+    box-shadow:
+      0 1px 0 0 oklch(0% 0 0 / 0.02),
+      0 1px 2px 0 oklch(0% 0 0 / 0.04),
+      0 12px 32px -16px oklch(20% 0.015 264 / 0.08);
+  }
+
+  /* Big editorial card, for hero / featured */
+  .paper-card-soft {
+    background: var(--color-paper-soft);
+    border: 1px solid var(--color-ink-line);
+  }
+
+  /* Hand-drawn underline (animated) */
+  .ink-underline {
+    position: relative;
+    display: inline-block;
+  }
+  .ink-underline::after {
+    content: "";
+    position: absolute;
+    left: -3%;
+    right: -3%;
+    bottom: -0.08em;
+    height: 0.45em;
+    background: var(--color-accent);
+    opacity: 0.32;
+    z-index: -1;
+    border-radius: 999px 12px 999px 12px / 999px 999px 999px 12px;
+    transform: skewX(-3deg) rotate(-0.6deg);
+  }
+
+  /* Editorial pull-quote dropcap */
+  .dropcap::first-letter {
+    font-family: var(--font-display);
+    font-size: 4em;
+    line-height: 0.9;
+    float: left;
+    margin: 0.05em 0.08em -0.1em 0;
+    color: var(--color-accent);
+  }
+
+  /* Soft hover lift, used for cards */
+  .lift {
+    transition:
+      transform 0.4s var(--ease-out-expo),
+      box-shadow 0.4s var(--ease-out-expo),
+      border-color 0.3s ease;
+  }
+  .lift:hover {
+    transform: translateY(-3px);
+    border-color: oklch(80% 0.014 80);
+    box-shadow:
+      0 1px 0 0 oklch(0% 0 0 / 0.02),
+      0 4px 8px 0 oklch(0% 0 0 / 0.04),
+      0 24px 48px -20px oklch(20% 0.015 264 / 0.14);
+  }
+
+  /* Tabular numbers, for stats */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Editorial small caps label */
+  .label-caps {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-ink-faint);
+  }
+
+  /* Ink rule, thin horizontal divider */
+  .ink-rule {
+    height: 1px;
+    background: var(--color-ink-line);
+  }
+  .ink-rule-strong {
+    height: 1px;
+    background: var(--color-ink);
+  }
+
+  /* Hidden scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes ink-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typing-cursor {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes draw-underline {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

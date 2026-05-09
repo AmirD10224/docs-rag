@@ -1,0 +1,48 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.12.4
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/localhost/6333' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      REDIS_URL: redis://redis:6379/0
+      ALLOWED_ORIGINS: http://localhost:3000
+      APP_ENV: local
+      MOCK_PROVIDERS: ${MOCK_PROVIDERS:-true}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      COHERE_API_KEY: ${COHERE_API_KEY:-}
+      JINA_API_KEY: ${JINA_API_KEY:-}
+    ports:
+      - "8000:8000"
+
+volumes:
+  qdrant_data:

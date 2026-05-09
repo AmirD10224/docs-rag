@@ -1,0 +1,103 @@
+name: Eval Gate
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "evals/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/eval.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: eval-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-evals:
+    name: Run golden-set evals
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.7"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --all-extras
+
+      - name: Fetch base report from main
+        id: base
+        run: |
+          set -euo pipefail
+          mkdir -p evals/reports
+          if git fetch --depth=1 origin main >/dev/null 2>&1 && \
+             git show "origin/main:evals/reports/latest.json" > /tmp/base.json 2>/dev/null; then
+            cp /tmp/base.json evals/reports/_base.json
+            echo "have_base=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "have_base=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run evals (live providers)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+          JINA_API_KEY: ${{ secrets.JINA_API_KEY }}
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          PYTHONPATH: backend:.
+          MOCK_PROVIDERS: "false"
+        run: uv run python evals/run.py --live
+
+      - name: Diff vs main
+        if: steps.base.outputs.have_base == 'true'
+        id: diff
+        run: |
+          set +e
+          uv run python evals/diff.py \
+            evals/reports/_base.json \
+            evals/reports/latest.json \
+            --out diff.md
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Comment diff on PR
+        if: steps.base.outputs.have_base == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('diff.md', 'utf8');
+            const issue_number = context.payload.pull_request.number;
+            const { owner, repo } = context.repo;
+            const existing = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const mine = existing.data.find(c =>
+              c.user.type === 'Bot' && c.body && c.body.startsWith('### DocsRAG Eval Diff')
+            );
+            if (mine) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: mine.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+      - name: Block merge on regression
+        if: steps.base.outputs.have_base == 'true' && steps.diff.outputs.exit_code != '0'
+        run: |
+          echo "::error title=Eval regression::Faithfulness or citation_accuracy regressed >3pp."
+          exit 1
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-reports
+          path: evals/reports/

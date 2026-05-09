@@ -1,0 +1,48 @@
+{
+  "run_id": "83dbaf2e-176d-476e-b2d1-c609c0ad5291",
+  "git_sha": "unknown",
+  "created_at": "2026-05-05T23:38:56.721413+00:00",
+  "prompt_version": "synthesis.v1",
+  "synthesis_model": "claude-sonnet-4-6",
+  "judge_model": "claude-sonnet-4-6",
+  "mock_providers": true,
+  "scores": [
+    {
+      "metric": "faithfulness",
+      "value": 0.0,
+      "n": 50
+    },
+    {
+      "metric": "citation_accuracy",
+      "value": 0.0,
+      "n": 50
+    },
+    {
+      "metric": "retrieval_precision",
+      "value": 0.0,
+      "n": 50
+    },
+    {
+      "metric": "judge_human_kappa",
+      "value": 0.0,
+      "n": 7
+    }
+  ],
+  "by_difficulty": {
+    "easy": {
+      "mean_faithfulness": 0.0,
+      "n": 19
+    },
+    "medium": {
+      "mean_faithfulness": 0.0,
+      "n": 22
+    },
+    "hard": {
+      "mean_faithfulness": 0.0,
+      "n": 9
+    }
+  },
+  "golden_set_size": 50,
+  "duration_seconds": 0.003,
+  "cost_usd": 0.0
+}
