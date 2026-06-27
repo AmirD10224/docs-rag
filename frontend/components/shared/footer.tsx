@@ -29,10 +29,7 @@ export function Footer() {
           </FooterCol>
 
           <FooterCol title="Made by">
-            <FooterLink href="https://github.com/AmirD10224" ext>
-              Amir Dhibi
-            </FooterLink>
-            <FooterLink href="mailto:amir10.dhibi@gmail.com">Email</FooterLink>
+            <li className="text-sm text-[var(--color-ink-soft)]">Amir Dhibi</li>
           </FooterCol>
 
           <FooterCol title="Legal">
